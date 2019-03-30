@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  */
 trait BooleanTimestampFieldManipulator
 {
-    public function initializeBooleanTimestampManipulator()
+    public function initializeBooleanTimestampFieldManipulator()
     {
         if (count($this->boolTimestampFields)) {
             $temp = [];
