@@ -1,0 +1,30 @@
+{
+    "name": "sarahman/laravel-timestamp-boolean-fields",
+    "description": "Deal with the fields whose timestamp value means their boolean status.",
+    "type": "utility",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Syed Abidur Rahman",
+            "email": "aabid048@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "illuminate/database": "~5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sarahman\\Database\\Support\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable"
+}
