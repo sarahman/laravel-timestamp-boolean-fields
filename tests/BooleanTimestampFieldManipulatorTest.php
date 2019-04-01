@@ -32,5 +32,14 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         ]);
 
         $this->assertNotNull($user->is_active);
+        $this->assertTrue($user->is_active);
+
+        $user2 = Tests\Entities\User::create([
+            'name' => 'Md Sadiqur Rahman',
+            'is_active' => 0
+        ]);
+
+        $this->assertNotNull($user2->is_active);
+        $this->assertFalse($user2->is_active);
     }
 }
