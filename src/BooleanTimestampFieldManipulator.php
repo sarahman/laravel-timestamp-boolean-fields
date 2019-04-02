@@ -16,11 +16,30 @@ use Illuminate\Support\Str;
  */
 trait BooleanTimestampFieldManipulator
 {
+    /**
+     * Boot the trait.
+     *
+     * Listen for the saving event of a model, and append the manipulated attribute values
+     * depending on the fields of defined $boolTimestampFields array.
+     *
+     * @throws \LogicException
+     */
+    protected static function bootBooleanTimestampFieldManipulator()
+    {
+        static::saved(function (self $model) {
+            if (count($model::$boolTimestampFields)) {
+                foreach ($model::$boolTimestampFields AS $field) {
+                    $model->attributes[$model->getAppendAttributeName($field)] = $model->attributes[$field];
+                }
+            }
+        });
+    }
+
     public function initializeBooleanTimestampFieldManipulator()
     {
-        if (count($this->boolTimestampFields)) {
+        if (count(self::$boolTimestampFields)) {
             $temp = [];
-            foreach ($this->boolTimestampFields AS $field) {
+            foreach (self::$boolTimestampFields AS $field) {
                 $temp[] = $this->getAppendAttributeName($field);
                 $this->casts[$field] = 'boolean';
             }
@@ -31,7 +50,7 @@ trait BooleanTimestampFieldManipulator
 
     public function setAttribute($key, $value)
     {
-        if (count($this->boolTimestampFields) && in_array($key, $this->boolTimestampFields)) {
+        if (count(self::$boolTimestampFields) && in_array($key, self::$boolTimestampFields)) {
             if ($value) {
                 $this->attributes[$key] = ($original = $this->getOriginal($key)) ? $original : \Carbon\Carbon::now();
             } else {
@@ -53,8 +72,8 @@ trait BooleanTimestampFieldManipulator
      */
     public function __call($method, $parameters)
     {
-        if (count($this->boolTimestampFields)) {
-            foreach ($this->boolTimestampFields AS $field) {
+        if (count(self::$boolTimestampFields)) {
+            foreach (self::$boolTimestampFields AS $field) {
                 if ($method == 'get' . Str::studly($this->getAppendAttributeName($field)) . 'Attribute') {
                     return $this->attributes[$field];
                 }
@@ -73,14 +92,14 @@ trait BooleanTimestampFieldManipulator
      */
     protected function castAttribute($key, $value)
     {
-        if (count($this->boolTimestampFields) && in_array($key, $this->boolTimestampFields)) {
+        if (count(self::$boolTimestampFields) && in_array($key, self::$boolTimestampFields)) {
             return !empty($value);
         }
 
         return parent::castAttribute($key, $value);
     }
 
-    private function getAppendAttributeName($field)
+    private static function getAppendAttributeName($field)
     {
         return 'time_being_' . preg_replace('/^is_/', '', $field);
     }

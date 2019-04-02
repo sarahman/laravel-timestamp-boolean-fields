@@ -11,5 +11,5 @@ class User extends Model
 
     protected $fillable = ['name', 'is_active'];
 
-    protected $boolTimestampFields = ['is_active'];
+    protected static $boolTimestampFields = ['is_active'];
 }
