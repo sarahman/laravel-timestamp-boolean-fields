@@ -12,6 +12,8 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
             'database' => ':memory:',
         ]);
 
+        $manager->setEventDispatcher(new \Illuminate\Events\Dispatcher(new \Illuminate\Container\Container()));
+
         $manager->setAsGlobal();
         $manager->bootEloquent();
 
@@ -33,6 +35,7 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertNotNull($user->is_active);
         $this->assertTrue($user->is_active);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $user->time_being_active);
 
         $user2 = Tests\Entities\User::create([
             'name' => 'Md Sadiqur Rahman',
@@ -41,5 +44,6 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertNotNull($user2->is_active);
         $this->assertFalse($user2->is_active);
+        $this->assertNull($user2->time_being_active);
     }
 }
