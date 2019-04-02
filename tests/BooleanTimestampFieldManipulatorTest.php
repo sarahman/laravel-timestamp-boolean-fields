@@ -26,6 +26,16 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
             $table->timestamps();
         });
 
+        $manager->schema()->create('notes', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+            $table->string('title');
+            $table->text('description');
+            $table->timestamp('is_unpublished')->nullable();
+            $table->timestamp('is_reported')->nullable();
+            $table->timestamps();
+        });
+
         self::$user = Tests\Entities\User::create([
             'name' => 'Syed Abidur Rahman',
             'is_active' => 1
@@ -95,5 +105,80 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($user2->is_active);
         $this->assertFalse($user2->is_active);
         $this->assertNull($user2->time_being_active);
+    }
+
+    /** @test */
+    public function it_checks_timestamp_boolean_field_value_when_a_model_has_more_than_one_bool_timestamp_field()
+    {
+        $note = Tests\Entities\Note::create([
+            'user_id' => 1,
+            'title' => 'Sample Note',
+            'description' => 'This is just sample note!',
+            'is_unpublished' => false,
+            'is_reported' => true
+        ]);
+
+        $this->assertNotNull($note->is_unpublished);
+        $this->assertFalse($note->is_unpublished);
+        $this->assertNull($note->time_being_unpublished);
+
+        $this->assertNotNull($note->is_reported);
+        $this->assertTrue($note->is_reported);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
+
+
+        $note->update(['title' => 'Sample Note!!!']);
+
+        $this->assertNotNull($note->is_unpublished);
+        $this->assertFalse($note->is_unpublished);
+        $this->assertNull($note->time_being_unpublished);
+
+        $this->assertNotNull($note->is_reported);
+        $this->assertTrue($note->is_reported);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
+
+
+        $note->update(['is_unpublished' => true]);
+
+        $this->assertNotNull($note->is_unpublished);
+        $this->assertTrue($note->is_unpublished);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_unpublished);
+
+        $this->assertNotNull($note->is_reported);
+        $this->assertTrue($note->is_reported);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
+
+
+        $note->update(['is_reported' => true]);
+
+        $this->assertNotNull($note->is_unpublished);
+        $this->assertTrue($note->is_unpublished);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_unpublished);
+
+        $this->assertNotNull($note->is_reported);
+        $this->assertTrue($note->is_reported);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
+
+
+        $note->update(['is_reported' => false]);
+
+        $this->assertNotNull($note->is_unpublished);
+        $this->assertTrue($note->is_unpublished);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_unpublished);
+
+        $this->assertNotNull($note->is_reported);
+        $this->assertFalse($note->is_reported);
+        $this->assertNull($note->time_being_reported);
+
+
+        $note->update(['is_unpublished' => false]);
+
+        $this->assertNotNull($note->is_unpublished);
+        $this->assertFalse($note->is_unpublished);
+        $this->assertNull($note->time_being_unpublished);
+
+        $this->assertNotNull($note->is_reported);
+        $this->assertFalse($note->is_reported);
+        $this->assertNull($note->time_being_reported);
     }
 }
