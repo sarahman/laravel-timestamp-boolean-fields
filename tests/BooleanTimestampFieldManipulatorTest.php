@@ -71,11 +71,29 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($user->is_active);
         $this->assertFalse($user->is_active);
         $this->assertNull($user->time_being_active);
+        $user->update(['is_active' => 1]);
 
         $user2 = Tests\Entities\User::where('name', 'Md Sadiqur Rahman')->first();
         $user2->update(['is_active' => 1]);
         $this->assertNotNull($user2->is_active);
         $this->assertTrue($user2->is_active);
         $this->assertInstanceOf(\Carbon\Carbon::class, $user2->time_being_active);
+        $user2->update(['is_active' => 0]);
+    }
+
+    /** @test */
+    public function it_checks_timestamp_boolean_field_value_when_updating_not_the_bool_timestamp_fields_of_a_model()
+    {
+        $user = Tests\Entities\User::where('name', 'Syed Abidur Rahman')->first();
+        $user->update(['name' => 'Abidur Rahman']);
+        $this->assertNotNull($user->is_active);
+        $this->assertTrue($user->is_active);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $user->time_being_active);
+
+        $user2 = Tests\Entities\User::where('name', 'Md Sadiqur Rahman')->first();
+        $user2->update(['name' => 'Sadiqur Rahman']);
+        $this->assertNotNull($user2->is_active);
+        $this->assertFalse($user2->is_active);
+        $this->assertNull($user2->time_being_active);
     }
 }

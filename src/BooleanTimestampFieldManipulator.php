@@ -2,8 +2,6 @@
 
 namespace Sarahman\Database\Support;
 
-use Illuminate\Support\Str;
-
 /**
  * Trait BooleanTimestampFieldManipulator
  *
@@ -29,7 +27,7 @@ trait BooleanTimestampFieldManipulator
         static::saved(function (self $model) {
             if (count($model::$boolTimestampFields)) {
                 foreach ($model::$boolTimestampFields AS $field) {
-                    $model->attributes[$model->getAppendAttributeName($field)] = $model->attributes[$field];
+                    $model->attributes[$model->getAppendableAttributeName($field)] = $model->attributes[$field];
                 }
             }
         });
@@ -38,13 +36,10 @@ trait BooleanTimestampFieldManipulator
     public function initializeBooleanTimestampFieldManipulator()
     {
         if (count(self::$boolTimestampFields)) {
-            $temp = [];
             foreach (self::$boolTimestampFields AS $field) {
-                $temp[] = $this->getAppendAttributeName($field);
                 $this->casts[$field] = 'boolean';
+                $this->casts[$this->getAppendableAttributeName($field)] = 'datetime';
             }
-
-            $this->append($temp);
         }
     }
 
@@ -64,26 +59,6 @@ trait BooleanTimestampFieldManipulator
     }
 
     /**
-     * Handle dynamic method calls into the model.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        if (count(self::$boolTimestampFields)) {
-            foreach (self::$boolTimestampFields AS $field) {
-                if ($method == 'get' . Str::studly($this->getAppendAttributeName($field)) . 'Attribute') {
-                    return $this->attributes[$field];
-                }
-            }
-        }
-
-        return parent::__call($method, $parameters);
-    }
-
-    /**
      * Cast an attribute to a native PHP type.
      *
      * @param  string  $key
@@ -92,14 +67,18 @@ trait BooleanTimestampFieldManipulator
      */
     protected function castAttribute($key, $value)
     {
-        if (count(self::$boolTimestampFields) && in_array($key, self::$boolTimestampFields)) {
-            return !empty($value);
+        if (count(self::$boolTimestampFields)) {
+            if (in_array($key, self::$boolTimestampFields)) {
+                return !empty($value);
+            } elseif (in_array(preg_replace('/^time_being_/', 'is_', $key), self::$boolTimestampFields)) {
+                return empty($value) ? null : $this->asDateTime($value);
+            }
         }
 
         return parent::castAttribute($key, $value);
     }
 
-    private static function getAppendAttributeName($field)
+    private static function getAppendableAttributeName($field)
     {
         return 'time_being_' . preg_replace('/^is_/', '', $field);
     }
