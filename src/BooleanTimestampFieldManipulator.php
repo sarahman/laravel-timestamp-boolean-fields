@@ -24,10 +24,26 @@ trait BooleanTimestampFieldManipulator
      */
     protected static function bootBooleanTimestampFieldManipulator()
     {
+        static::saving(function (self $model) {
+            if (count($model::$boolTimestampFields)) {
+                foreach ($model::$boolTimestampFields AS $field) {
+                    unset($model->attributes[$model->getAppendableAttributeName($field)]);
+                }
+            }
+        });
+
         static::saved(function (self $model) {
             if (count($model::$boolTimestampFields)) {
                 foreach ($model::$boolTimestampFields AS $field) {
                     $model->attributes[$model->getAppendableAttributeName($field)] = $model->attributes[$field];
+                }
+            }
+        });
+
+        static::retrieved(function (self $model) {
+            if (count($model::$boolTimestampFields)) {
+                foreach ($model::$boolTimestampFields AS $field) {
+                    $model->attributes[$model->getAppendableAttributeName($field)] = ($original = $model->getOriginal($field)) ? $model->asDateTime($original) : $original;
                 }
             }
         });

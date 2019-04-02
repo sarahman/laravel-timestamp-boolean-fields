@@ -66,17 +66,23 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull(self::$user->is_active);
         $this->assertFalse(self::$user->is_active);
         $this->assertNull(self::$user->time_being_active);
+        self::$user->update(['is_active' => 1]);
 
         self::$user2->update(['is_active' => 1]);
         $this->assertNotNull(self::$user2->is_active);
         $this->assertTrue(self::$user2->is_active);
         $this->assertInstanceOf(\Carbon\Carbon::class, self::$user2->time_being_active);
+        self::$user2->update(['is_active' => 0]);
     }
 
     /** @test */
     public function it_checks_timestamp_boolean_field_value_when_updating_a_fetched_model_from_database()
     {
         $user = Tests\Entities\User::where('name', 'Syed Abidur Rahman')->first();
+        $this->assertNotNull($user->is_active);
+        $this->assertTrue($user->is_active);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $user->time_being_active);
+
         $user->update(['is_active' => 0]);
         $this->assertNotNull($user->is_active);
         $this->assertFalse($user->is_active);
@@ -84,6 +90,10 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $user->update(['is_active' => 1]);
 
         $user2 = Tests\Entities\User::where('name', 'Md Sadiqur Rahman')->first();
+        $this->assertNotNull($user2->is_active);
+        $this->assertFalse($user2->is_active);
+        $this->assertNull($user2->time_being_active);
+
         $user2->update(['is_active' => 1]);
         $this->assertNotNull($user2->is_active);
         $this->assertTrue($user2->is_active);
