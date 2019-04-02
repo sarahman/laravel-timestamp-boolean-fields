@@ -1,5 +1,5 @@
 # Dealing with the Timestamp based Boolean fields for the Laravel PHP Framework
-## v1.0.0
+## v1.1.0
 
 ## Introduction
 
@@ -7,7 +7,7 @@ In scenarios when you want to understand the db boolean field value as not only 
  when it becomes true.
 
 Normally, you would just use it in your model class and define the timestamp-based boolean fields in the
- `$boolTimestampFields` attribute.
+ `$boolTimestampFields` property as well as in `$fillable` property.
 
 **Note**: The timestamp-based field names must be prefixed by `is_`; and the field names without its `is_` prefix will 
  be appended in the model attributes with `time_being_` prefix; i.e. `is_active` field name will appended in the model
@@ -28,7 +28,9 @@ class Product extends Model
 {
     use BooleanTimestampFieldManipulator;
 
-    protected $boolTimestampFields = ['is_active'];
+    protected $fillable = ['title', 'description', 'is_active'];
+
+    protected static $boolTimestampFields = ['is_active'];
 }
 ```
 
@@ -38,7 +40,7 @@ class Product extends Model
 This trait is installed via [Composer](http://getcomposer.org/). To install, simply add to your `composer.json` file:
 
 ```
-$ composer require sarahman/laravel-timestamp-boolean-fields
+$ composer require sarahman/laravel-timestamp-boolean-fields:1.1.*
 ```
 
 ## Support
