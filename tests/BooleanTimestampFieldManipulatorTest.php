@@ -118,6 +118,23 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
             'is_reported' => true
         ]);
 
+        $this->it_checks_timestamp_boolean_field_value_when_a_model_having_more_than_one_bool_timestamp_field($note);
+
+
+        Tests\Entities\Note::create([
+            'user_id' => 2,
+            'title' => 'Sample Note 2',
+            'description' => 'This is 2nd sample note!',
+            'is_unpublished' => false,
+            'is_reported' => true
+        ]);
+
+        $dbNote = Tests\Entities\Note::where('description', 'This is 2nd sample note!')->first();
+        $this->it_checks_timestamp_boolean_field_value_when_a_model_having_more_than_one_bool_timestamp_field($dbNote);
+    }
+
+    private function it_checks_timestamp_boolean_field_value_when_a_model_having_more_than_one_bool_timestamp_field(\Tests\Entities\Note $note)
+    {
         $this->assertNotNull($note->is_unpublished);
         $this->assertFalse($note->is_unpublished);
         $this->assertNull($note->time_being_unpublished);
