@@ -26,7 +26,7 @@ trait BooleanTimestampFieldManipulator
     {
         static::saving(function (self $model) {
             if (count($model::$boolTimestampFields)) {
-                foreach ($model::$boolTimestampFields AS $field) {
+                foreach ($model::$boolTimestampFields as $field) {
                     unset($model->attributes[$model->getAppendableAttributeName($field)]);
                 }
             }
@@ -34,7 +34,11 @@ trait BooleanTimestampFieldManipulator
 
         static::saved(function (self $model) {
             if (count($model::$boolTimestampFields)) {
-                foreach ($model::$boolTimestampFields AS $field) {
+                foreach ($model::$boolTimestampFields as $field) {
+                    if (!isset($model->attributes[$field])) {
+                        continue;
+                    }
+
                     $model->attributes[$model->getAppendableAttributeName($field)] = $model->attributes[$field];
                 }
             }
@@ -42,7 +46,7 @@ trait BooleanTimestampFieldManipulator
 
         static::retrieved(function (self $model) {
             if (count($model::$boolTimestampFields)) {
-                foreach ($model::$boolTimestampFields AS $field) {
+                foreach ($model::$boolTimestampFields as $field) {
                     $model->attributes[$model->getAppendableAttributeName($field)] = ($original = $model->getOriginal($field)) ? $model->asDateTime($original) : $original;
                 }
             }
@@ -52,7 +56,7 @@ trait BooleanTimestampFieldManipulator
     public function initializeBooleanTimestampFieldManipulator()
     {
         if (count(self::$boolTimestampFields)) {
-            foreach (self::$boolTimestampFields AS $field) {
+            foreach (self::$boolTimestampFields as $field) {
                 $this->casts[$field] = 'boolean';
                 $this->casts[$this->getAppendableAttributeName($field)] = 'datetime';
             }
