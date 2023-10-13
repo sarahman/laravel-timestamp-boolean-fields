@@ -4,7 +4,8 @@ use Illuminate\Database\Capsule\Manager;
 
 class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
 {
-    private static $user, $user2;
+    private static $user;
+    private static $user2;
 
     public static function setupBeforeClass()
     {
@@ -37,13 +38,13 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         });
 
         self::$user = Tests\Entities\User::create([
-            'name' => 'Syed Abidur Rahman',
-            'is_active' => 1
+            'name'      => 'Syed Abidur Rahman',
+            'is_active' => 1,
         ]);
 
         self::$user2 = Tests\Entities\User::create([
-            'name' => 'Md Sadiqur Rahman',
-            'is_active' => 0
+            'name'      => 'Md Sadiqur Rahman',
+            'is_active' => 0,
         ]);
     }
 
@@ -121,22 +122,21 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
     public function it_checks_timestamp_boolean_field_value_when_a_model_has_more_than_one_bool_timestamp_field()
     {
         $note = Tests\Entities\Note::create([
-            'user_id' => 1,
-            'title' => 'Sample Note',
-            'description' => 'This is just sample note!',
+            'user_id'        => 1,
+            'title'          => 'Sample Note',
+            'description'    => 'This is just sample note!',
             'is_unpublished' => false,
-            'is_reported' => true
+            'is_reported'    => true,
         ]);
 
         $this->it_checks_timestamp_boolean_field_value_when_a_model_having_more_than_one_bool_timestamp_field($note);
 
-
         Tests\Entities\Note::create([
-            'user_id' => 2,
-            'title' => 'Sample Note 2',
-            'description' => 'This is 2nd sample note!',
+            'user_id'        => 2,
+            'title'          => 'Sample Note 2',
+            'description'    => 'This is 2nd sample note!',
             'is_unpublished' => false,
-            'is_reported' => true
+            'is_reported'    => true,
         ]);
 
         $dbNote = Tests\Entities\Note::where('description', 'This is 2nd sample note!')->first();
@@ -153,7 +153,6 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($note->is_reported);
         $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
 
-
         $note->update(['title' => 'Sample Note!!!']);
 
         $this->assertNotNull($note->is_unpublished);
@@ -163,7 +162,6 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($note->is_reported);
         $this->assertTrue($note->is_reported);
         $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
-
 
         $note->update(['is_unpublished' => true]);
 
@@ -175,7 +173,6 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($note->is_reported);
         $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
 
-
         $note->update(['is_reported' => true]);
 
         $this->assertNotNull($note->is_unpublished);
@@ -186,7 +183,6 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($note->is_reported);
         $this->assertInstanceOf(\Carbon\Carbon::class, $note->time_being_reported);
 
-
         $note->update(['is_reported' => false]);
 
         $this->assertNotNull($note->is_unpublished);
@@ -196,7 +192,6 @@ class BooleanTimestampFieldManipulatorTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($note->is_reported);
         $this->assertFalse($note->is_reported);
         $this->assertNull($note->time_being_reported);
-
 
         $note->update(['is_unpublished' => false]);
 

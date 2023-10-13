@@ -3,13 +3,13 @@
 namespace Sarahman\Database\Support;
 
 /**
- * Trait BooleanTimestampFieldManipulator
+ * This trait deals with the boolean-cum timestamp field.
  *
- * @package Sarahman\Database\Support
  * @property array $boolTimestampFields
  * @property array $attributes
  * @property array $casts
- * @method self append($attributes)
+ *
+ * @method self        append($attributes)
  * @method mixed|array getOriginal($key = null, $default = null)
  */
 trait BooleanTimestampFieldManipulator
@@ -81,8 +81,9 @@ trait BooleanTimestampFieldManipulator
     /**
      * Cast an attribute to a native PHP type.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function castAttribute($key, $value)
@@ -100,6 +101,6 @@ trait BooleanTimestampFieldManipulator
 
     private static function getAppendableAttributeName($field)
     {
-        return 'time_being_' . preg_replace('/^is_/', '', $field);
+        return 'time_being_'.preg_replace('/^is_/', '', $field);
     }
 }
