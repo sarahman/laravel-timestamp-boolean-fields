@@ -2,6 +2,8 @@
 
 namespace Sarahman\Database\Support;
 
+use Carbon\Carbon;
+
 /**
  * This trait deals with the boolean-cum timestamp field.
  *
@@ -9,16 +11,17 @@ namespace Sarahman\Database\Support;
  * @property array $attributes
  * @property array $casts
  *
- * @method self        append($attributes)
- * @method mixed|array getOriginal($key = null, $default = null)
+ * @method self           append(array $attributes)
+ * @method mixed|array    getOriginal(string $key = null, mixed $default = null)
+ * @method \Carbon\Carbon asDateTime(mixed $value)
  */
 trait BooleanTimestampFieldManipulator
 {
     /**
      * Boot the trait.
      *
-     * Listen for the saving event of a model, and append the manipulated attribute values
-     * depending on the fields of defined $boolTimestampFields array.
+     * By booting this trait, it listens for the saving event of a model and
+     * append the manipulated attribute values depending on the fields of defined $boolTimestampFields array.
      *
      * @throws \LogicException
      */
@@ -67,7 +70,7 @@ trait BooleanTimestampFieldManipulator
     {
         if (count(self::$boolTimestampFields) && in_array($key, self::$boolTimestampFields)) {
             if ($value) {
-                $this->attributes[$key] = ($original = $this->getOriginal($key)) ? $original : \Carbon\Carbon::now();
+                $this->attributes[$key] = ($original = $this->getOriginal($key)) ? $original : Carbon::now();
             } else {
                 $this->attributes[$key] = null;
             }
