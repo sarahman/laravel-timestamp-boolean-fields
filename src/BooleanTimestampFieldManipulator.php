@@ -35,13 +35,7 @@ trait BooleanTimestampFieldManipulator
         });
 
         static::saved(function (self $model) {
-            foreach ((array) $model::$boolTimestampFields as $field) {
-                if (!isset($model->attributes[$field])) {
-                    continue;
-                }
-
-                $model->attributes[$model->getAppendableAttributeName($field)] = $model->attributes[$field];
-            }
+            $model->setBoolTimestampFieldsIntoAttributes($model);
         });
 
         if (method_exists(__CLASS__, 'retrieved')) {
@@ -103,15 +97,7 @@ trait BooleanTimestampFieldManipulator
 
     public function syncOriginal()
     {
-        foreach ((array) self::$boolTimestampFields as $field) {
-            if (!isset($this->attributes[$field])) {
-                continue;
-            }
-
-            $original = $this->attributes[$field];
-            $this->attributes[$field] = !empty($original);
-            $this->attributes[$this->getAppendableAttributeName($field)] = $original ? $this->asDateTime($original) : $original;
-        }
+        $this->setBoolTimestampFieldsIntoAttributes($this);
 
         return parent::syncOriginal();
     }
@@ -119,5 +105,18 @@ trait BooleanTimestampFieldManipulator
     private static function getAppendableAttributeName($field)
     {
         return 'time_being_'.preg_replace('/^is_/', '', $field);
+    }
+
+    private function setBoolTimestampFieldsIntoAttributes(self $model)
+    {
+        foreach ((array) self::$boolTimestampFields as $field) {
+            if (!isset($model->attributes[$field])) {
+                continue;
+            }
+
+            $original = $model->attributes[$field];
+            $model->attributes[$field] = !empty($original);
+            $model->attributes[$model->getAppendableAttributeName($field)] = $original ? $model->asDateTime($original) : $original;
+        }
     }
 }
