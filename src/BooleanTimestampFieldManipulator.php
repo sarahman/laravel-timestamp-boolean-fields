@@ -29,31 +29,27 @@ trait BooleanTimestampFieldManipulator
     protected static function bootBooleanTimestampFieldManipulator()
     {
         static::saving(function (self $model) {
-            if (count($model::$boolTimestampFields)) {
-                foreach ($model::$boolTimestampFields as $field) {
-                    unset($model->attributes[$model->getAppendableAttributeName($field)]);
-                }
+            foreach ((array) $model::$boolTimestampFields as $field) {
+                unset($model->attributes[$model->getAppendableAttributeName($field)]);
             }
         });
 
         static::saved(function (self $model) {
-            if (count($model::$boolTimestampFields)) {
-                foreach ($model::$boolTimestampFields as $field) {
-                    if (!isset($model->attributes[$field])) {
-                        continue;
-                    }
-
-                    $model->attributes[$model->getAppendableAttributeName($field)] = $model->attributes[$field];
+            foreach ((array) $model::$boolTimestampFields as $field) {
+                if (!isset($model->attributes[$field])) {
+                    continue;
                 }
+
+                $model->attributes[$model->getAppendableAttributeName($field)] = $model->attributes[$field];
             }
         });
 
         if (method_exists(__CLASS__, 'retrieved')) {
             static::retrieved(function (self $model) {
-                if (count($model::$boolTimestampFields)) {
-                    foreach ($model::$boolTimestampFields as $field) {
-                        $model->attributes[$model->getAppendableAttributeName($field)] = ($original = $model->getOriginal($field)) ? $model->asDateTime($original) : $original;
-                    }
+                foreach ((array) $model::$boolTimestampFields as $field) {
+                    $original = $model->getOriginal($field);
+                    $model->attributes[$field] = !empty($original);
+                    $model->attributes[$model->getAppendableAttributeName($field)] = $original ? $model->asDateTime($original) : $original;
                 }
             });
         }
