@@ -14,6 +14,7 @@ use Carbon\Carbon;
  * @method self           append(array $attributes)
  * @method mixed|array    getOriginal(string $key = null, mixed $default = null)
  * @method \Carbon\Carbon asDateTime(mixed $value)
+ * @method self           syncOriginal()
  */
 trait BooleanTimestampFieldManipulator
 {
@@ -47,13 +48,15 @@ trait BooleanTimestampFieldManipulator
             }
         });
 
-        static::retrieved(function (self $model) {
-            if (count($model::$boolTimestampFields)) {
-                foreach ($model::$boolTimestampFields as $field) {
-                    $model->attributes[$model->getAppendableAttributeName($field)] = ($original = $model->getOriginal($field)) ? $model->asDateTime($original) : $original;
+        if (method_exists(__CLASS__, 'retrieved')) {
+            static::retrieved(function (self $model) {
+                if (count($model::$boolTimestampFields)) {
+                    foreach ($model::$boolTimestampFields as $field) {
+                        $model->attributes[$model->getAppendableAttributeName($field)] = ($original = $model->getOriginal($field)) ? $model->asDateTime($original) : $original;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public function initializeBooleanTimestampFieldManipulator()
@@ -100,6 +103,21 @@ trait BooleanTimestampFieldManipulator
         }
 
         return parent::castAttribute($key, $value);
+    }
+
+    public function syncOriginal()
+    {
+        foreach ((array) self::$boolTimestampFields as $field) {
+            if (!isset($this->attributes[$field])) {
+                continue;
+            }
+
+            $original = $this->attributes[$field];
+            $this->attributes[$field] = !empty($original);
+            $this->attributes[$this->getAppendableAttributeName($field)] = $original ? $this->asDateTime($original) : $original;
+        }
+
+        return parent::syncOriginal();
     }
 
     private static function getAppendableAttributeName($field)
