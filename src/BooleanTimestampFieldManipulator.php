@@ -15,6 +15,8 @@ use Carbon\Carbon;
  * @method mixed|array    getOriginal(string $key = null, mixed $default = null)
  * @method \Carbon\Carbon asDateTime(mixed $value)
  * @method self           syncOriginal()
+ *
+ * @see \Illuminate\Database\Eloquent\Model
  */
 trait BooleanTimestampFieldManipulator
 {
@@ -97,9 +99,11 @@ trait BooleanTimestampFieldManipulator
 
     public function syncOriginal()
     {
-        $this->setBoolTimestampFieldsIntoAttributes($this);
+        $result = parent::syncOriginal();
 
-        return parent::syncOriginal();
+        $this->setBoolTimestampFieldsIntoAttributes($this, true);
+
+        return $result;
     }
 
     private static function getAppendableAttributeName($field)
@@ -107,10 +111,10 @@ trait BooleanTimestampFieldManipulator
         return 'time_being_'.preg_replace('/^is_/', '', $field);
     }
 
-    private function setBoolTimestampFieldsIntoAttributes(self $model)
+    private function setBoolTimestampFieldsIntoAttributes(self $model, $checkAttributeExists = false)
     {
         foreach ((array) self::$boolTimestampFields as $field) {
-            if (!isset($model->attributes[$field])) {
+            if ($checkAttributeExists && !array_key_exists($field, $model->attributes)) {
                 continue;
             }
 
