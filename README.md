@@ -27,6 +27,14 @@ class Product extends Model
     protected $fillable = ['title', 'description', 'is_active'];
 
     protected static $boolTimestampFields = ['is_active'];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        /** This trait method call is required for laravel v4.*. */
+        self::bootBooleanTimestampFieldManipulator();
+    }
 }
 ```
 
@@ -39,6 +47,20 @@ composer require sarahman/laravel-timestamp-boolean-fields:1.1.*
 ```
 
 After installing, you would just use it in your eloquent/model class and define the timestamp-based boolean fields in the `$boolTimestampFields` property as well as in `$fillable` property.
+
+If the project is developed in Laravel v4.*, then you need to call `bootBooleanTimestampFieldManipulator()` method in the `boot()` of the class.
+
+```php
+<?php
+...
+    public static function boot()
+    {
+        parent::boot();
+
+        self::bootBooleanTimestampFieldManipulator();
+    }
+...
+```
 
 **Note**: The timestamp-based field names must be prefixed by `is_`; and the field names without its `is_` prefix will be appended in the model attributes with `time_being_` prefix; i.e. `is_active` field name will appended in the model attributes as `time_being_active` name. The `is_active` field value will be boolean and `time_being_active` field value will the timestamp value.
 
